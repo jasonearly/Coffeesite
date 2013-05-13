@@ -1,6 +1,8 @@
+- content_for :head do
+  = tag :meta, :name => "stripe-key", :content => STRIPE_PUBLIC_KEY
 %h2 Sign up
-= simple_form_for(resource, :as => resource_name, :url => registration_path(resource_name), :html => |
-  {:class => 'card_form form-vertical' }) do |f|                                                     |
+#stripe_error.alert.alert-error{:style => "display:none"}
+= simple_form_for(resource, :as => resource_name, :url => registration_path(resource_name), :html => {:class => 'card_form form-vertical' }) do |f|
   %h3
     = params[:plan].titleize if params[:plan]
     Subscription Plan
@@ -11,4 +13,20 @@
   = f.input :email, :required => true
   = f.input :password, :required => true
   = f.input :password_confirmation, :required => true
+  - if @user.stripe_token
+    %p Credit card acceptance is pending.
+  - else
+    .field
+      = label_tag :card_number, "Credit Card Number"
+      = text_field_tag :card_number, nil, name: nil
+    .field
+      = label_tag :card_code, "Card Security Code (CVV)"
+      = text_field_tag :card_code, nil, name: nil
+    .field
+      = label_tag :card_month, "Card Expiration"
+      = select_month nil, {add_month_numbers: true}, {name: nil, id: "card_month"}
+      = select_year nil, {start_year: Date.today.year, end_year: Date.today.year+10}, {name: nil, id: "card_year"}
+    .field
+      = f.input :coupon, :label => "Promotional Coupon (if any)"
+  = f.hidden_field :stripe_token
   = f.button :submit, 'Sign up', :class => 'btn-primary'
