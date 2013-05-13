@@ -9,6 +9,20 @@ devise :database_authenticatable, :registerable,
 attr_accessible :name, :email, :password, :password_confirmation, :remember_me, :stripe_token, :coupon
 attr_accessor :stripe_token, :coupon
 before_save :update_stripe
+before_destroy :cancel_subscription
+def update_plan(role)
+	self.role_ids = []
+	self.add_role(role.name)
+	unless customer_id.nil?
+		customer = Stripe::Customer.retrieve(customer_id)
+		customer.update_subscription(:plan => role.name)
+	end
+	true
+rescue Stripe::StripeError => e
+	logger.error "Stripe Error: " + e.message
+	errors.add :base, "Unable to update your subscription. #{e.message}."
+	false
+end
 def update_stripe
 	return if email.include?(ENV['ADMIN_EMAIL'])
 	return if email.include?('@example.com') and not Rails.env.production?
@@ -48,6 +62,20 @@ rescue Stripe::StripeError => e
 	logger.error "Stripe Error: " + e.message
 	errors.add :base, "#{e.message}."
 	self.stripe_token = nil
+	false
+end
+def cancel_subscription
+	unless customer_id.nil?
+		customer = Stripe::Customer.retrieve(customer_id)
+		unless customer.nil? or customer.respond_to?('deleted')
+			if customer.subscription.status == 'active'
+				customer.cancel_subscription
+			end
+		end
+	end
+rescue Stripe::StripeError => e
+	logger.error "Stripe Error: " + e.message
+	errors.add :base, "Unable to cancel your subscription. #{e.message}."
 	false
 end
 end
