@@ -1,4 +1,5 @@
 CoffeeSite::Application.routes.draw do
+	mount StripeEvent::Engine => '/stripe'
 	get "content/gold"
 	get "content/silver"
 	get "content/platinum"
