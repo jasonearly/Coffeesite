@@ -232,6 +232,7 @@ DEPENDENCIES
   html2haml (>= 1.0.1)
   jquery-rails
   launchy (>= 2.2.0)
+  mail
   quiet_assets (>= 1.0.2)
   rails (= 3.2.13)
   rolify (>= 3.2.0)

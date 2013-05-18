@@ -29,3 +29,4 @@ gem "binding_of_caller", ">= 0.7.1", :group => :development, :platforms => [:mri
 gem "stripe", ">= 1.7.11"
 gem "stripe_event", ">= 0.4.0"
 gem "selenium-webdriver"
+gem "mail"

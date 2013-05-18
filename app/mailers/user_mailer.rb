@@ -3,10 +3,11 @@ class UserMailer < ActionMailer::Base
 
 	def welcome_email(user)
 	    @user = user
-	    mail(:to => user.email, :subject => "Welcome to My Awesome Site")
+	    mail(:to => user.email, :subject => "Registered")
   	end
 
 	def expire_email(user)
+		@user = user
 		mail(:to => user.email, :subject => "Subscription Cancelled")
 	end
 
