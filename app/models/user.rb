@@ -10,6 +10,8 @@ attr_accessible :name, :email, :password, :password_confirmation, :remember_me, 
 attr_accessor :stripe_token, :coupon
 before_save :update_stripe
 before_destroy :cancel_subscription
+after_create :send_email_post_signup
+
 def update_plan(role)
 	self.role_ids = []
 	self.add_role(role.name)
@@ -81,5 +83,8 @@ end
 def expire
 	UserMailer.expire_email(self).deliver
 	destroy
+end
+def send_email_post_signup
+	UserMailer.welcome_email(self).deliver
 end
 end
